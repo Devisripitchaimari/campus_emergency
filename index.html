@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Campus Emergency System</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f6ff;
+  color: #183153;
+}
+
+header {
+  background: #155eef;
+  color: white;
+  padding: 25px 15px;
+  text-align: center;
+}
+
+.container {
+  max-width: 650px;
+  margin: 30px auto;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #dce7fa;
+  box-shadow: 0 4px 15px #dce7fa;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  background: #155eef;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+button:active { background: #1045b5; }
+
+#location {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f1f6ff;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+
+a { color: #155eef; }
+
+.note {
+  color: #64748b;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h2>SMART CAMPUS</h2>
+  <p>Emergency Alert System</p>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h3>Mobile Location</h3>
+    <p>Touch the button to find your current phone location.</p>
+
+    <button onclick="getLocation()">📍 VIEW MY LOCATION</button>
+
+    <div id="location" aria-live="polite">
+      Location not requested yet.
+    </div>
+
+    <p class="note">
+      Your browser will ask permission before sharing your location.
+    </p>
+  </div>
+</div>
+
+<script>
+function getLocation() {
+  const output = document.getElementById("location");
+
+  if (!navigator.geolocation) {
+    output.textContent = "Geolocation is not supported by this browser.";
+    return;
+  }
+
+  output.textContent = "Requesting location permission...";
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const accuracy = Math.round(position.coords.accuracy);
+
+      const mapURL =
+        "https://www.google.com/maps?q=" +
+        latitude + "," + longitude;
+
+      output.replaceChildren();
+
+      const heading = document.createElement("strong");
+      heading.textContent = "Location found!";
+      output.appendChild(heading);
+
+      const details = document.createElement("p");
+      details.textContent =
+        "Latitude: " + latitude.toFixed(6) +
+        "\nLongitude: " + longitude.toFixed(6) +
+        "\nEstimated accuracy: " + accuracy + " metres";
+      details.style.whiteSpace = "pre-line";
+      output.appendChild(details);
+
+      const link = document.createElement("a");
+      link.href = mapURL;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Open location in Google Maps";
+      output.appendChild(link);
+    },
+
+    function(error) {
+      const messages = {
+        1: "Location permission denied. Allow location in browser settings.",
+        2: "Location unavailable. Check your phone's location setting.",
+        3: "Location request timed out. Try again."
+      };
+
+      output.textContent =
+        messages[error.code] || "Unable to get location.";
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+  );
+}
+</script>
+</body>
+</html>
